@@ -1,0 +1,126 @@
+openapi: 3.0.3
+info:
+  title: Events API
+  version: 1.0.0
+  description: Simple REST API to manage events.
+
+servers:
+  - url: http://localhost:8080
+
+paths:
+  /events:
+    get:
+      summary: List events
+      operationId: listEvents
+      responses:
+        '200':
+          description: A list of events ordered by start_time ascending.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Event'
+    post:
+      summary: Create event
+      operationId: createEvent
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateEventRequest'
+      responses:
+        '201':
+          description: Event created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Event'
+        '400':
+          description: Validation error or invalid input
+          content:
+            text/plain:
+              schema:
+                type: string
+
+  /events/{id}:
+    get:
+      summary: Get event by ID
+      operationId: getEventById
+      parameters:
+        - name: id
+          in: path
+          description: Event UUID
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Event found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Event'
+        '400':
+          description: Invalid UUID
+          content:
+            text/plain:
+              schema:
+                type: string
+        '404':
+          description: Event not found
+          content:
+            text/plain:
+              schema:
+                type: string
+
+components:
+  schemas:
+    Event:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        title:
+          type: string
+          maxLength: 100
+        description:
+          type: string
+          nullable: true
+        start_time:
+          type: string
+          format: date-time
+        end_time:
+          type: string
+          format: date-time
+        created_at:
+          type: string
+          format: date-time
+      required:
+        - id
+        - title
+        - start_time
+        - end_time
+        - created_at
+
+    CreateEventRequest:
+      type: object
+      properties:
+        title:
+          type: string
+          maxLength: 100
+        description:
+          type: string
+        start_time:
+          type: string
+          format: date-time
+        end_time:
+          type: string
+          format: date-time
+      required:
+        - title
+        - start_time
+        - end_time
